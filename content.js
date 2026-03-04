@@ -290,12 +290,17 @@
     const url = e.dataTransfer.getData("text/uri-list") || e.dataTransfer.getData("text/plain");
     if (url && /^https?:\/\/.+/i.test(url)) {
       fetch(url)
-        .then((r) => r.blob())
+        .then((r) => {
+          const ct = r.headers.get("content-type") || "";
+          if (!ct.startsWith("image/")) throw new Error("not an image");
+          return r.blob();
+        })
         .then((blob) => {
+          if (blob.size > 20 * 1024 * 1024) return; /* skip files > 20 MB */
           const file = new File([blob], "image.png", { type: blob.type || "image/png" });
           forwardFileToIframe(file);
         })
-        .catch(() => { /* silently ignore fetch errors */ });
+        .catch(() => { /* silently ignore fetch/validation errors */ });
     }
   });
 
@@ -314,7 +319,7 @@
           fileType: file.type,
           buffer: reader.result
         },
-        "*"
+        "https://www.remove.bg"
       );
     };
     reader.readAsArrayBuffer(file);

@@ -5,7 +5,6 @@
   "description": "A sleek Chrome extension for instant background removal. Drag & drop images into the sidebar to process them via remove.bg.",
   "permissions": [
     "declarativeNetRequest",
-    "declarativeNetRequestFeedback",
     "storage",
     "scripting"
   ],
